@@ -11,14 +11,14 @@ namespace tutWebApi.Models
                 new Student
                 {
                     Id = 1,
-                    StudentName = "Sanidhh khandelwal",
+                    StudentName = "Sanidhh",
                     Email = "test#gmail.com",
                     Address = "Hyd, India"
                 },
                 new Student
                 {
                     Id = 2,
-                    StudentName = "bravo jhon",
+                    StudentName = "bravo",
                     Email = "ntpsn#gmail.com",
                     Address = "bng, India"
                 }
