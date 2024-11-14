@@ -1,0 +1,6 @@
+@tutWebApi_HostAddress = http://localhost:5199
+
+GET {{tutWebApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
