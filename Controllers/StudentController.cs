@@ -131,6 +131,11 @@ namespace tutWebApi.Controllers
             {
                 return BadRequest("The input can not be null");
             }
+
+            if (model.AddmissionDate < DateTime.Now)
+            {
+                ModelState.AddModelError("AddmissionDate Error", "Addmission date shold be greater than current date");
+            }
             int newId = CollegeRepository.Students.LastOrDefault().Id + 1;
 
             Student student = new Student
