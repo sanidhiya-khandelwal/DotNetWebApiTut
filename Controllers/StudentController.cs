@@ -12,18 +12,21 @@ namespace tutWebApi.Controllers
     public class StudentController : ControllerBase
     {
         [HttpGet]
+        [Route("All")]
         public IEnumerable<Student> GetStudentName()
         {
             return CollegeRepository.Students;
         }
 
-        [HttpGet("{id:int}")]
+        [HttpGet]
+        [Route("{id}")]
         public Student GetStudentById(int id)
         {
             return CollegeRepository.Students.Where(n => n.Id == id).FirstOrDefault();
         }
 
         [HttpGet]
+        [Route("{name:alpha}")]
         public Student GetStudentByName(string name)
         {
             return CollegeRepository.Students.Where(n => n.StudentName == name).FirstOrDefault();
