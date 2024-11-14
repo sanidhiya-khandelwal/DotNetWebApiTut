@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using tutWebApi.Models;
 
 namespace tutWebApi.Controllers
 {
@@ -11,9 +12,15 @@ namespace tutWebApi.Controllers
     public class StudentController : ControllerBase
     {
         [HttpGet]
-        public string GetStudentName()
+        public IEnumerable<Student> GetStudentName()
         {
-            return "student name";
+            return CollegeRepository.Students;
+        }
+
+        [HttpGet("{id:int}")]
+        public Student GetStudentById(int id)
+        {
+            return CollegeRepository.Students.Where(n => n.Id == id).FirstOrDefault();
         }
     }
 }
