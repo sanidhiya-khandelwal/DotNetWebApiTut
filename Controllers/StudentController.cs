@@ -15,9 +15,30 @@ namespace tutWebApi.Controllers
         [Route("All")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<IEnumerable<Student>> GetStudentName()
+        public ActionResult<IEnumerable<StudentDto>> GetStudentName()
         {
-            return Ok(CollegeRepository.Students);
+            //Method 1: loop thru forEach
+            // var students = new List<StudentDto>();
+            // foreach (var item in CollegeRepository.Students)
+            // {
+            //     StudentDto obj = new StudentDto()
+            //     {
+            //         Id = item.Id,
+            //         StudentName = item.StudentName,
+            //         Email = item.Email
+            //     };
+            //     students.Add(obj);
+            // }
+
+            //Method 2: Loop using LINQ
+            var students = CollegeRepository.Students.Select(item => new StudentDto()
+            {
+                Id = item.Id,
+                StudentName = item.StudentName,
+                Email = item.Email
+            });
+
+            return Ok(students);
         }
 
         [HttpGet]
@@ -26,7 +47,7 @@ namespace tutWebApi.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<Student> GetStudentById(int id)
+        public ActionResult<StudentDto> GetStudentById(int id)
         {
             if (id <= 0)
             {
@@ -38,6 +59,12 @@ namespace tutWebApi.Controllers
             {
                 return NotFound($"The student with {id} is not present");
             }
+            var studentDto = new StudentDto
+            {
+                Id = student.Id,
+                StudentName = student.StudentName,
+                Email = student.Email
+            };
             return Ok(student);
         }
 
@@ -46,7 +73,7 @@ namespace tutWebApi.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<Student> GetStudentByName(string name)
+        public ActionResult<StudentDto> GetStudentByName(string name)
         {
             if (string.IsNullOrEmpty(name))
             {
@@ -57,7 +84,13 @@ namespace tutWebApi.Controllers
             {
                 return NotFound($"Student with {name} is not present");
             }
-            return Ok(student);
+            var studentDto = new StudentDto()
+            {
+                Id = student.Id,
+                StudentName = student.StudentName,
+                Email = student.Email
+            };
+            return Ok(studentDto);
         }
 
         [HttpDelete("{id:int}")]
