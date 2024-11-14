@@ -13,6 +13,7 @@ namespace tutWebApi.Controllers
     {
         [HttpGet]
         [Route("All")]
+        [ProducesResponseType(500)]
         public ActionResult<IEnumerable<Student>> GetStudentName()
         {
             return Ok(CollegeRepository.Students);
@@ -20,6 +21,10 @@ namespace tutWebApi.Controllers
 
         [HttpGet]
         [Route("{id}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
         public ActionResult<Student> GetStudentById(int id)
         {
             if (id <= 0)
@@ -36,6 +41,10 @@ namespace tutWebApi.Controllers
         }
 
         [HttpGet("byname/{name:alpha}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
         public ActionResult<Student> GetStudentByName(string name)
         {
             if (string.IsNullOrEmpty(name))
@@ -51,6 +60,10 @@ namespace tutWebApi.Controllers
         }
 
         [HttpDelete("{id:int}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
         public ActionResult<bool> DeleteStudent(int id)
         {
             if (id <= 0)
