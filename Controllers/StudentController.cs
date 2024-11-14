@@ -22,5 +22,19 @@ namespace tutWebApi.Controllers
         {
             return CollegeRepository.Students.Where(n => n.Id == id).FirstOrDefault();
         }
+
+        [HttpGet]
+        public Student GetStudentByName(string name)
+        {
+            return CollegeRepository.Students.Where(n => n.StudentName == name).FirstOrDefault();
+        }
+
+        [HttpDelete("{id:int}")]
+        public bool DeleteStudent(int id)
+        {
+            var student = CollegeRepository.Students.Where(n => n.Id == id).FirstOrDefault();
+            CollegeRepository.Students.Remove(student);
+            return true;
+        }
     }
 }
