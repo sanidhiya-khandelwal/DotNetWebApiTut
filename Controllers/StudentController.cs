@@ -13,31 +13,57 @@ namespace tutWebApi.Controllers
     {
         [HttpGet]
         [Route("All")]
-        public IEnumerable<Student> GetStudentName()
+        public ActionResult<IEnumerable<Student>> GetStudentName()
         {
-            return CollegeRepository.Students;
+            return Ok(CollegeRepository.Students);
         }
 
         [HttpGet]
         [Route("{id}")]
-        public Student GetStudentById(int id)
+        public ActionResult<Student> GetStudentById(int id)
         {
-            return CollegeRepository.Students.Where(n => n.Id == id).FirstOrDefault();
+            if (id <= 0)
+            {
+                return BadRequest($"{id} less than or equla to 0 not allowed");
+            }
+
+            var student = CollegeRepository.Students.Where(n => n.Id == id).FirstOrDefault();
+            if (student == null)
+            {
+                return NotFound($"The student with {id} is not present");
+            }
+            return Ok(student);
         }
 
-        [HttpGet]
-        [Route("{name:alpha}")]
-        public Student GetStudentByName(string name)
+        [HttpGet("byname/{name:alpha}")]
+        public ActionResult<Student> GetStudentByName(string name)
         {
-            return CollegeRepository.Students.Where(n => n.StudentName == name).FirstOrDefault();
+            if (string.IsNullOrEmpty(name))
+            {
+                return BadRequest($"{name} should not be null");
+            }
+            var student = CollegeRepository.Students.Where(n => n.StudentName == name).FirstOrDefault();
+            if (student == null)
+            {
+                return NotFound($"Student with {name} is not present");
+            }
+            return Ok(student);
         }
 
         [HttpDelete("{id:int}")]
-        public bool DeleteStudent(int id)
+        public ActionResult<bool> DeleteStudent(int id)
         {
+            if (id <= 0)
+            {
+                return BadRequest("Id should be greater than 0");
+            }
             var student = CollegeRepository.Students.Where(n => n.Id == id).FirstOrDefault();
+            if (student == null)
+            {
+                return NotFound($"Student with id = {id} is not present");
+            }
             CollegeRepository.Students.Remove(student);
-            return true;
+            return Ok(true);
         }
     }
 }
