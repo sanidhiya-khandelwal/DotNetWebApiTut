@@ -43,7 +43,7 @@ namespace tutWebApi.Controllers
         }
 
         [HttpGet]
-        [Route("{id}")]
+        [Route("{id}", Name = "GetStudentById")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -118,7 +118,7 @@ namespace tutWebApi.Controllers
 
         [HttpPost]
         [Route("Create")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public ActionResult<StudentDto> CreateStudent([FromBody] StudentDto model)
@@ -139,7 +139,7 @@ namespace tutWebApi.Controllers
             CollegeRepository.Students.Add(student);
 
             model.Id = newId;
-            return Ok(model);
+            return CreatedAtRoute("GetStudentById", new { id = newId }, model);
         }
     }
 }
