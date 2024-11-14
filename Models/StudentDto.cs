@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using tutWebApi.Models.Validators;
 
 namespace tutWebApi.Models
 {
@@ -23,6 +24,7 @@ namespace tutWebApi.Models
         public string? Password { get; set; }
         [Compare(nameof(Password))]
         public string? ConfirmPassword { get; set; }
+        [DateCheck]
         public DateTime AddmissionDate { get; set; }
     }
 }
