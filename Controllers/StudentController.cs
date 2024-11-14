@@ -35,7 +35,8 @@ namespace tutWebApi.Controllers
             {
                 Id = item.Id,
                 StudentName = item.StudentName,
-                Email = item.Email
+                Email = item.Email,
+                Address = item.Address
             });
 
             return Ok(students);
@@ -63,7 +64,8 @@ namespace tutWebApi.Controllers
             {
                 Id = student.Id,
                 StudentName = student.StudentName,
-                Email = student.Email
+                Email = student.Email,
+                Address = student.Address
             };
             return Ok(student);
         }
@@ -88,7 +90,8 @@ namespace tutWebApi.Controllers
             {
                 Id = student.Id,
                 StudentName = student.StudentName,
-                Email = student.Email
+                Email = student.Email,
+                Address = student.Address
             };
             return Ok(studentDto);
         }
@@ -111,6 +114,32 @@ namespace tutWebApi.Controllers
             }
             CollegeRepository.Students.Remove(student);
             return Ok(true);
+        }
+
+        [HttpPost]
+        [Route("Create")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public ActionResult<StudentDto> CreateStudent([FromBody] StudentDto model)
+        {
+            if (model == null)
+            {
+                return BadRequest("The input can not be null");
+            }
+            int newId = CollegeRepository.Students.LastOrDefault().Id + 1;
+
+            Student student = new Student
+            {
+                Id = newId,
+                StudentName = model.StudentName,
+                Email = model.Email,
+                Address = model.Address
+            };
+            CollegeRepository.Students.Add(student);
+
+            model.Id = newId;
+            return Ok(model);
         }
     }
 }
