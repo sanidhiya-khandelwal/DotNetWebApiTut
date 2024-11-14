@@ -8,7 +8,7 @@ using tutWebApi.Models;
 namespace tutWebApi.Controllers
 {
     [Route("api/[controller]")]
-    // [ApiController]
+    [ApiController]
     public class StudentController : ControllerBase
     {
         [HttpGet]
@@ -123,10 +123,10 @@ namespace tutWebApi.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public ActionResult<StudentDto> CreateStudent([FromBody] StudentDto model)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            // if (!ModelState.IsValid)
+            // {
+            //     return BadRequest(ModelState);
+            // }
             if (model == null)
             {
                 return BadRequest("The input can not be null");
