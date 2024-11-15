@@ -12,12 +12,20 @@ namespace tutWebApi.Controllers
     [ApiController]
     public class StudentController : ControllerBase
     {
+        private readonly ILogger<StudentController> _logger;
+
+        public StudentController(ILogger<StudentController> logger)
+        {
+            _logger = logger;
+        }
+
         [HttpGet]
         [Route("All")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public ActionResult<IEnumerable<StudentDto>> GetStudentName()
         {
+            _logger.LogInformation("All students method called");
             //Method 1: loop thru forEach
             // var students = new List<StudentDto>();
             // foreach (var item in CollegeRepository.Students)
@@ -53,12 +61,14 @@ namespace tutWebApi.Controllers
         {
             if (id <= 0)
             {
+                _logger.LogWarning("Bad Request");
                 return BadRequest($"{id} less than or equla to 0 not allowed");
             }
 
             var student = CollegeRepository.Students.Where(n => n.Id == id).FirstOrDefault();
             if (student == null)
             {
+                _logger.LogError("Student not found with given id");
                 return NotFound($"The student with {id} is not present");
             }
             var studentDto = new StudentDto
@@ -80,11 +90,13 @@ namespace tutWebApi.Controllers
         {
             if (string.IsNullOrEmpty(name))
             {
+                _logger.LogWarning("Bad Request");
                 return BadRequest($"{name} should not be null");
             }
             var student = CollegeRepository.Students.Where(n => n.StudentName == name).FirstOrDefault();
             if (student == null)
             {
+                _logger.LogError("Student with given name not found");
                 return NotFound($"Student with {name} is not present");
             }
             var studentDto = new StudentDto()
@@ -106,11 +118,13 @@ namespace tutWebApi.Controllers
         {
             if (id <= 0)
             {
+                _logger.LogWarning("Bad Request");
                 return BadRequest("Id should be greater than 0");
             }
             var student = CollegeRepository.Students.Where(n => n.Id == id).FirstOrDefault();
             if (student == null)
             {
+                _logger.LogError("Studnt with given id not found");
                 return NotFound($"Student with id = {id} is not present");
             }
             CollegeRepository.Students.Remove(student);
@@ -130,6 +144,7 @@ namespace tutWebApi.Controllers
             // }
             if (model == null)
             {
+                _logger.LogWarning("Bad Request");
                 return BadRequest("The input can not be null");
             }
 
@@ -162,12 +177,14 @@ namespace tutWebApi.Controllers
         {
             if (model == null || model.Id <= 0)
             {
+                _logger.LogWarning("Bad Request");
                 return BadRequest();
             }
             var existingStudent = CollegeRepository.Students.Where(s => s.Id == model.Id).FirstOrDefault();
 
             if (existingStudent == null)
             {
+                _logger.LogError("Student not found");
                 return NotFound();
             }
             existingStudent.StudentName = model.StudentName;
@@ -187,12 +204,14 @@ namespace tutWebApi.Controllers
         {
             if (patchDocument == null || id <= 0)
             {
+                _logger.LogWarning("Bad Request");
                 return BadRequest();
             }
             var existingStudent = CollegeRepository.Students.Where(s => s.Id == id).FirstOrDefault();
 
             if (existingStudent == null)
             {
+                _logger.LogError("Student not found");
                 return NotFound();
             }
 
@@ -207,6 +226,7 @@ namespace tutWebApi.Controllers
             patchDocument.ApplyTo(studentDto, ModelState);
             if (!ModelState.IsValid)
             {
+                _logger.LogWarning("Bad Request");
                 return BadRequest(ModelState);
             }
             existingStudent.StudentName = studentDto.StudentName;
