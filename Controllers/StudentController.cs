@@ -150,5 +150,30 @@ namespace tutWebApi.Controllers
             model.Id = newId;
             return CreatedAtRoute("GetStudentById", new { id = newId }, model);
         }
+
+        [HttpPut]
+        [Route("Update")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public ActionResult UpdateStudent([FromBody] StudentDto model)
+        {
+            if (model == null || model.Id <= 0)
+            {
+                return BadRequest();
+            }
+            var existingStudent = CollegeRepository.Students.Where(s => s.Id == model.Id).FirstOrDefault();
+
+            if (existingStudent == null)
+            {
+                return NotFound();
+            }
+            existingStudent.StudentName = model.StudentName;
+            existingStudent.Address = model.Address;
+            existingStudent.Email = model.Email;
+
+            return NoContent();
+        }
     }
 }
