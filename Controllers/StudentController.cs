@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using tutWebApi.Models;
 
@@ -173,6 +174,44 @@ namespace tutWebApi.Controllers
             existingStudent.Address = model.Address;
             existingStudent.Email = model.Email;
 
+            return NoContent();
+        }
+
+        [HttpPatch]
+        [Route("{id:int}/UpdatePartial")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public ActionResult UpdateStudentPartial(int id, [FromBody] JsonPatchDocument<StudentDto> patchDocument)
+        {
+            if (patchDocument == null || id <= 0)
+            {
+                return BadRequest();
+            }
+            var existingStudent = CollegeRepository.Students.Where(s => s.Id == id).FirstOrDefault();
+
+            if (existingStudent == null)
+            {
+                return NotFound();
+            }
+
+            var studentDto = new StudentDto
+            {
+                Id = existingStudent.Id,
+                StudentName = existingStudent.StudentName,
+                Email = existingStudent.Email,
+                Address = existingStudent.Address
+            };
+            //ModelState has errors so we can use it to throw bad request
+            patchDocument.ApplyTo(studentDto, ModelState);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            existingStudent.StudentName = studentDto.StudentName;
+            existingStudent.Address = studentDto.Address;
+            existingStudent.Email = studentDto.Email;
             return NoContent();
         }
     }
