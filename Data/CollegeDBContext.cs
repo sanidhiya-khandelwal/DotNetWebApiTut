@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using tutWebApi.Data.Config;
 
 namespace tutWebApi.Data
 {
@@ -22,37 +23,45 @@ namespace tutWebApi.Data
         */
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Student>().HasData(new List<Student>()
-            {
-                new Student
-                {
-                    Id = 1,
-                    StudentName = "Venkat",
-                    Address = "India,Hyd",
-                    Email = "Venkat@gmail.com"
-                },
-                new Student
-                {
-                    Id = 2,
-                    StudentName = "Venkat1",
-                    Address = "India,Hyd1",
-                    Email = "Venkat1@gmail.com"
-                },
-            }
-            );
+            /*
+                StudentConfig is the name of class where we wrote
+                All th configs related to "Student" table
+                configs means- dummy data, required fields
+            */
+            modelBuilder.ApplyConfiguration(new StudentConfig());
+            // modelBuilder.Entity<Student>().HasData(new List<Student>()
+            // {
+            //     new Student
+            //     {
+            //         Id = 1,
+            //         StudentName = "Venkat",
+            //         Address = "India,Hyd",
+            //         Email = "Venkat@gmail.com"
+            //     },
+            //     new Student
+            //     {
+            //         Id = 2,
+            //         StudentName = "Venkat1",
+            //         Address = "India,Hyd1",
+            //         Email = "Venkat1@gmail.com"
+            //     },
+            // }
+            // );
+            //----------------------------------------------------------------------------------------------
             /*
                 After wrtiting below code , run these commands
                 - dotnet ef migrations add ModifyStudentSchema
                 - dotnet ef database update    
             */
-            modelBuilder.Entity<Student>(entity =>
-                {
-                    entity.Property(n => n.StudentName).IsRequired();
-                    entity.Property(n => n.StudentName).HasMaxLength(250);
-                    entity.Property(n => n.Address).IsRequired(false).HasMaxLength(500);
-                    entity.Property(n => n.Email).IsRequired().HasMaxLength(250);
-                }
-            );
+
+            // modelBuilder.Entity<Student>(entity =>
+            //     {
+            // entity.Property(n => n.StudentName).IsRequired();
+            // entity.Property(n => n.StudentName).HasMaxLength(250);
+            // entity.Property(n => n.Address).IsRequired(false).HasMaxLength(500);
+            // entity.Property(n => n.Email).IsRequired().HasMaxLength(250);
+            // }
+            // );
         }
     }
 }
