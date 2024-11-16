@@ -40,6 +40,19 @@ namespace tutWebApi.Data
                 },
             }
             );
+            /*
+                After wrtiting below code , run these commands
+                - dotnet ef migrations add ModifyStudentSchema
+                - dotnet ef database update    
+            */
+            modelBuilder.Entity<Student>(entity =>
+                {
+                    entity.Property(n => n.StudentName).IsRequired();
+                    entity.Property(n => n.StudentName).HasMaxLength(250);
+                    entity.Property(n => n.Address).IsRequired(false).HasMaxLength(500);
+                    entity.Property(n => n.Email).IsRequired().HasMaxLength(250);
+                }
+            );
         }
     }
 }
