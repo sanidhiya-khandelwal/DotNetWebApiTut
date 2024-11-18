@@ -43,14 +43,17 @@ namespace tutWebApi.Controllers
             // }
 
             //Method 2: Loop using LINQ
-            var students = _dbContext.Students.Select(item => new StudentDto()
-            {
-                Id = item.Id,
-                StudentName = item.StudentName,
-                Email = item.Email,
-                Address = item.Address
-            });
+            // var students = _dbContext.Students.Select(item => new StudentDto()
+            // {
+            //     Id = item.Id,
+            //     StudentName = item.StudentName,
+            //     Email = item.Email,
+            //     Address = item.Address
+            // });
 
+            // Method 3:  after  using EF we have EF crud operations
+            // var students = _dbContext.Students; //this will read all the values inside Students (Student model), to manipulate somethinig we can go for DTO and remove in controller itself some values that u dont want or add some values if u want to calculate something
+            var students = _dbContext.Students.ToList(); //above and below line both are same
             return Ok(students);
         }
 
