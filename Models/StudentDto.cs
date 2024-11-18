@@ -19,12 +19,12 @@ namespace tutWebApi.Models
         public string? Email { get; set; }
         [Required]
         public string? Address { get; set; }
-        [Range(10, 20)]
-        public int age { get; set; }
-        public string? Password { get; set; }
-        [Compare(nameof(Password))]
-        public string? ConfirmPassword { get; set; }
-        [DateCheck]
-        public DateTime AddmissionDate { get; set; }
+        // [Range(10, 20)]
+        // public int age { get; set; }
+        // public string? Password { get; set; }
+        // [Compare(nameof(Password))]
+        // public string? ConfirmPassword { get; set; }
+        // [DateCheck]
+        // public DateTime AddmissionDate { get; set; }
     }
 }

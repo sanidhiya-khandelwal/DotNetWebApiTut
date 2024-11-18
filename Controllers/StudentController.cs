@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using tutWebApi.Models;
+using tutWebApi.Data;
 
 namespace tutWebApi.Controllers
 {
@@ -13,10 +14,12 @@ namespace tutWebApi.Controllers
     public class StudentController : ControllerBase
     {
         private readonly ILogger<StudentController> _logger;
+        private readonly CollegeDBContext _dbContext;
 
-        public StudentController(ILogger<StudentController> logger)
+        public StudentController(ILogger<StudentController> logger, CollegeDBContext dbContext)
         {
             _logger = logger;
+            _dbContext = dbContext;
         }
 
         [HttpGet]
@@ -40,7 +43,7 @@ namespace tutWebApi.Controllers
             // }
 
             //Method 2: Loop using LINQ
-            var students = CollegeRepository.Students.Select(item => new StudentDto()
+            var students = _dbContext.Students.Select(item => new StudentDto()
             {
                 Id = item.Id,
                 StudentName = item.StudentName,
@@ -65,7 +68,7 @@ namespace tutWebApi.Controllers
                 return BadRequest($"{id} less than or equla to 0 not allowed");
             }
 
-            var student = CollegeRepository.Students.Where(n => n.Id == id).FirstOrDefault();
+            var student = _dbContext.Students.Where(n => n.Id == id).FirstOrDefault();
             if (student == null)
             {
                 _logger.LogError("Student not found with given id");
@@ -93,7 +96,7 @@ namespace tutWebApi.Controllers
                 _logger.LogWarning("Bad Request");
                 return BadRequest($"{name} should not be null");
             }
-            var student = CollegeRepository.Students.Where(n => n.StudentName == name).FirstOrDefault();
+            var student = _dbContext.Students.Where(n => n.StudentName == name).FirstOrDefault();
             if (student == null)
             {
                 _logger.LogError("Student with given name not found");
@@ -121,13 +124,15 @@ namespace tutWebApi.Controllers
                 _logger.LogWarning("Bad Request");
                 return BadRequest("Id should be greater than 0");
             }
-            var student = CollegeRepository.Students.Where(n => n.Id == id).FirstOrDefault();
+            var student = _dbContext.Students.Where(n => n.Id == id).FirstOrDefault();
             if (student == null)
             {
                 _logger.LogError("Studnt with given id not found");
                 return NotFound($"Student with id = {id} is not present");
             }
-            CollegeRepository.Students.Remove(student);
+            _dbContext.Students.Remove(student);
+
+            _dbContext.SaveChanges();
             return Ok(true);
         }
 
@@ -152,19 +157,21 @@ namespace tutWebApi.Controllers
             // {
             //     ModelState.AddModelError("AddmissionDate Error", "Addmission date shold be greater than current date");
             // }
-            int newId = CollegeRepository.Students.LastOrDefault().Id + 1;
+           
+            //since now id is autoincremented we dont need this now
+            // int newId = CollegeRepository.Students.LastOrDefault().Id + 1;
 
             Student student = new Student
             {
-                Id = newId,
                 StudentName = model.StudentName,
                 Email = model.Email,
                 Address = model.Address
             };
-            CollegeRepository.Students.Add(student);
+            _dbContext.Students.Add(student);
+            _dbContext.SaveChanges();
 
-            model.Id = newId;
-            return CreatedAtRoute("GetStudentById", new { id = newId }, model);
+            model.Id = student.Id;
+            return CreatedAtRoute("GetStudentById", new { id = model.Id }, model);
         }
 
         [HttpPut]
@@ -180,7 +187,7 @@ namespace tutWebApi.Controllers
                 _logger.LogWarning("Bad Request");
                 return BadRequest();
             }
-            var existingStudent = CollegeRepository.Students.Where(s => s.Id == model.Id).FirstOrDefault();
+            var existingStudent = _dbContext.Students.Where(s => s.Id == model.Id).FirstOrDefault();
 
             if (existingStudent == null)
             {
@@ -190,6 +197,8 @@ namespace tutWebApi.Controllers
             existingStudent.StudentName = model.StudentName;
             existingStudent.Address = model.Address;
             existingStudent.Email = model.Email;
+
+            _dbContext.SaveChanges();
 
             return NoContent();
         }
@@ -207,7 +216,7 @@ namespace tutWebApi.Controllers
                 _logger.LogWarning("Bad Request");
                 return BadRequest();
             }
-            var existingStudent = CollegeRepository.Students.Where(s => s.Id == id).FirstOrDefault();
+            var existingStudent = _dbContext.Students.Where(s => s.Id == id).FirstOrDefault();
 
             if (existingStudent == null)
             {
@@ -232,6 +241,8 @@ namespace tutWebApi.Controllers
             existingStudent.StudentName = studentDto.StudentName;
             existingStudent.Address = studentDto.Address;
             existingStudent.Email = studentDto.Email;
+
+            _dbContext.SaveChanges();
             return NoContent();
         }
     }

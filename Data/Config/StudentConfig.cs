@@ -11,7 +11,7 @@ namespace tutWebApi.Data.Config
     {
         public void Configure(EntityTypeBuilder<Student> builder)
         {
-            builder.ToTable("Sudents");
+            builder.ToTable("Students");
             builder.HasKey(x => x.Id);
 
             builder.Property(x => x.Id).UseIdentityColumn();

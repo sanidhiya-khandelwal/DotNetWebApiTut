@@ -15,7 +15,7 @@ namespace tutWebApi.Data
 
         }
         //step 1: create table dataset
-        DbSet<Student> Students { get; set; }
+        public DbSet<Student> Students { get; set; }
 
         /*after overriding the below method and adding the dummy data, write below commands
             -  dotnet ef migrations add AddDummyData
