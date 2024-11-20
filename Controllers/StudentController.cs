@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using tutWebApi.Models;
 using tutWebApi.Data;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace tutWebApi.Controllers
 {
@@ -26,7 +28,7 @@ namespace tutWebApi.Controllers
         [Route("All")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<IEnumerable<StudentDto>> GetStudentName()
+        public async Task<ActionResult<IEnumerable<StudentDto>>> GetStudentNameAsync()
         {
             _logger.LogInformation("All students method called");
             //Method 1: loop thru forEach
@@ -43,7 +45,7 @@ namespace tutWebApi.Controllers
             // }
 
             //Method 2: Loop using LINQ
-            // var students = _dbContext.Students.Select(item => new StudentDto()
+            // var students = await _dbContext.Students.Select(item => new StudentDto()
             // {
             //     Id = item.Id,
             //     StudentName = item.StudentName,
@@ -53,7 +55,7 @@ namespace tutWebApi.Controllers
 
             // Method 3:  after  using EF we have EF crud operations
             // var students = _dbContext.Students; //this will read all the values inside Students (Student model), to manipulate somethinig we can go for DTO and remove in controller itself some values that u dont want or add some values if u want to calculate something
-            var students = _dbContext.Students.ToList(); //above and below line both are same
+            var students = await _dbContext.Students.ToListAsync(); //above and below line both are same
             return Ok(students);
         }
 
@@ -63,7 +65,7 @@ namespace tutWebApi.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<StudentDto> GetStudentById(int id)
+        public async Task<ActionResult<StudentDto>> GetStudentByIdAsync(int id)
         {
             if (id <= 0)
             {
@@ -71,7 +73,7 @@ namespace tutWebApi.Controllers
                 return BadRequest($"{id} less than or equla to 0 not allowed");
             }
 
-            var student = _dbContext.Students.Where(n => n.Id == id).FirstOrDefault();
+            var student = await _dbContext.Students.Where(n => n.Id == id).FirstOrDefaultAsync();
             if (student == null)
             {
                 _logger.LogError("Student not found with given id");
@@ -92,14 +94,14 @@ namespace tutWebApi.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<StudentDto> GetStudentByName(string name)
+        public async Task<ActionResult<StudentDto>> GetStudentByNameAsync(string name)
         {
             if (string.IsNullOrEmpty(name))
             {
                 _logger.LogWarning("Bad Request");
                 return BadRequest($"{name} should not be null");
             }
-            var student = _dbContext.Students.Where(n => n.StudentName == name).FirstOrDefault();
+            var student = await _dbContext.Students.Where(n => n.StudentName == name).FirstOrDefaultAsync();
             if (student == null)
             {
                 _logger.LogError("Student with given name not found");
@@ -120,14 +122,14 @@ namespace tutWebApi.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<bool> DeleteStudent(int id)
+        public async Task<ActionResult<bool>> DeleteStudent(int id)
         {
             if (id <= 0)
             {
                 _logger.LogWarning("Bad Request");
                 return BadRequest("Id should be greater than 0");
             }
-            var student = _dbContext.Students.Where(n => n.Id == id).FirstOrDefault();
+            var student = await _dbContext.Students.Where(n => n.Id == id).FirstOrDefaultAsync();
             if (student == null)
             {
                 _logger.LogError("Studnt with given id not found");
@@ -135,7 +137,7 @@ namespace tutWebApi.Controllers
             }
             _dbContext.Students.Remove(student);
 
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
             return Ok(true);
         }
 
@@ -144,7 +146,7 @@ namespace tutWebApi.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<StudentDto> CreateStudent([FromBody] StudentDto model)
+        public async Task<ActionResult<StudentDto>> CreateStudentAsync([FromBody] StudentDto model)
         {
             // if (!ModelState.IsValid)
             // {
@@ -170,8 +172,8 @@ namespace tutWebApi.Controllers
                 Email = model.Email,
                 Address = model.Address
             };
-            _dbContext.Students.Add(student);
-            _dbContext.SaveChanges();
+            await _dbContext.Students.AddAsync(student);
+            await _dbContext.SaveChangesAsync();
 
             model.Id = student.Id;
             return CreatedAtRoute("GetStudentById", new { id = model.Id }, model);
@@ -183,14 +185,14 @@ namespace tutWebApi.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult UpdateStudent([FromBody] StudentDto model)
+        public async Task<ActionResult> UpdateStudentAsync([FromBody] StudentDto model)
         {
             if (model == null || model.Id <= 0)
             {
                 _logger.LogWarning("Bad Request");
                 return BadRequest();
             }
-            var existingStudent = _dbContext.Students.Where(s => s.Id == model.Id).FirstOrDefault();
+            var existingStudent = await _dbContext.Students.Where(s => s.Id == model.Id).FirstOrDefaultAsync();
 
             if (existingStudent == null)
             {
@@ -201,7 +203,7 @@ namespace tutWebApi.Controllers
             existingStudent.Address = model.Address;
             existingStudent.Email = model.Email;
 
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
 
             return NoContent();
         }
@@ -212,14 +214,14 @@ namespace tutWebApi.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult UpdateStudentPartial(int id, [FromBody] JsonPatchDocument<StudentDto> patchDocument)
+        public async Task<ActionResult> UpdateStudentPartialAsync(int id, [FromBody] JsonPatchDocument<StudentDto> patchDocument)
         {
             if (patchDocument == null || id <= 0)
             {
                 _logger.LogWarning("Bad Request");
                 return BadRequest();
             }
-            var existingStudent = _dbContext.Students.Where(s => s.Id == id).FirstOrDefault();
+            var existingStudent = await _dbContext.Students.Where(s => s.Id == id).FirstOrDefaultAsync();
 
             if (existingStudent == null)
             {
@@ -245,7 +247,7 @@ namespace tutWebApi.Controllers
             existingStudent.Address = studentDto.Address;
             existingStudent.Email = studentDto.Email;
 
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
             return NoContent();
         }
     }
